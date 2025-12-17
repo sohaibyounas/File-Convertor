@@ -7,7 +7,8 @@ const features = [
   {
     icon: Sparkles,
     title: "OCR Technology",
-    description: "Extract text from images and PDFs with 95%+ accuracy in 12 languages",
+    description:
+      "Extract text from images and PDFs with 95%+ accuracy in 12 languages",
     color: "text-purple-500",
   },
   {
@@ -19,13 +20,15 @@ const features = [
   {
     icon: Shield,
     title: "100% Secure",
-    description: "All processing happens in your browser. Files never leave your device",
+    description:
+      "All processing happens in your browser. Files never leave your device",
     color: "text-green-500",
   },
   {
     icon: Globe,
     title: "Multiple Formats",
-    description: "Support for DOCX, PDF, PPTX, JPG, PNG with bidirectional conversion",
+    description:
+      "Support for DOCX, PDF, PPTX, JPG, PNG with bidirectional conversion",
     color: "text-blue-500",
   },
 ];
@@ -52,7 +55,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent"
+          className="text-4xl md:text-6xl font-bold mb-6 bg-linear-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent"
         >
           Professional File Conversion
           <br />
@@ -66,8 +69,9 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto"
         >
-          Convert DOCX, PDF, PPTX, and images instantly. Extract text with advanced OCR.
-          All processing happens in your browser for maximum privacy.
+          Convert DOCX, PDF, PPTX, and images instantly. Extract text with
+          advanced OCR. All processing happens in your browser for maximum
+          privacy.
         </motion.p>
 
         {/* CTA */}

@@ -1,7 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FileText, Image as ImageIcon, X, Download, AlertCircle, CheckCircle2 } from "lucide-react";
+import {
+  FileText,
+  Image as ImageIcon,
+  X,
+  Download,
+  AlertCircle,
+  CheckCircle2,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -36,12 +43,12 @@ export function FileCard({ file, index }: FileCardProps) {
         <div
           className={`absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${
             file.status === "completed"
-              ? "bg-gradient-to-br from-green-500/5 to-green-600/5"
+              ? "bg-linear-to-br from-green-500/5 to-green-600/5"
               : file.status === "error"
-              ? "bg-gradient-to-br from-red-500/5 to-red-600/5"
+              ? "bg-linear-to-br from-red-500/5 to-red-600/5"
               : file.status === "processing"
-              ? "bg-gradient-to-br from-blue-500/5 to-purple-600/5 shimmer"
-              : "bg-gradient-to-br from-primary/5 to-primary/10"
+              ? "bg-linear-to-br from-blue-500/5 to-purple-600/5 shimmer"
+              : "bg-linear-to-br from-primary/5 to-primary/10"
           }`}
         />
 
@@ -49,9 +56,13 @@ export function FileCard({ file, index }: FileCardProps) {
           {/* File Icon */}
           <motion.div
             className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg ${
-              file.status === "processing" ? "bg-primary/20 animate-pulse" : "bg-primary/10"
+              file.status === "processing"
+                ? "bg-primary/20 animate-pulse"
+                : "bg-primary/10"
             }`}
-            animate={file.status === "processing" ? { scale: [1, 1.05, 1] } : {}}
+            animate={
+              file.status === "processing" ? { scale: [1, 1.05, 1] } : {}
+            }
             transition={{ duration: 1.5, repeat: Infinity }}
           >
             <Icon className="h-6 w-6 text-primary" />
@@ -137,7 +148,9 @@ export function FileCard({ file, index }: FileCardProps) {
                   size="sm"
                   variant="gradient"
                   className="w-full"
-                  onClick={() => downloadFile(file.result!.blob, file.result!.filename)}
+                  onClick={() =>
+                    downloadFile(file.result!.blob, file.result!.filename)
+                  }
                 >
                   <Download className="h-4 w-4" />
                   Download {file.result.outputType.toUpperCase()}
@@ -146,7 +159,8 @@ export function FileCard({ file, index }: FileCardProps) {
                 {/* OCR Confidence */}
                 {file.result.ocrData && (
                   <p className="mt-2 text-xs text-muted-foreground text-center">
-                    OCR Confidence: {Math.round(file.result.ocrData.confidence)}%
+                    OCR Confidence: {Math.round(file.result.ocrData.confidence)}
+                    %
                   </p>
                 )}
               </motion.div>
