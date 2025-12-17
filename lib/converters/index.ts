@@ -1,6 +1,15 @@
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import type { ConversionResult } from "@/types";
 
+// Helper to initialize PDF Worker
+async function initPdfWorker() {
+  const pdfjs = await import("pdfjs-dist");
+  if (!pdfjs.GlobalWorkerOptions.workerSrc) {
+    pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+  }
+  return pdfjs;
+}
+
 export async function convertDocxToPdf(file: File): Promise<ConversionResult> {
   // Extract text from DOCX
   const mammoth = await import("mammoth");
@@ -78,7 +87,7 @@ export async function convertDocxToPdf(file: File): Promise<ConversionResult> {
 
 export async function convertPdfToDocx(file: File): Promise<ConversionResult> {
   const { Document, Paragraph, TextRun, Packer } = await import("docx");
-  const { getDocument } = await import("pdfjs-dist");
+  const { getDocument } = await initPdfWorker();
 
   // Load PDF
   const arrayBuffer = await file.arrayBuffer();
@@ -267,6 +276,90 @@ export async function convertImageToPdf(file: File): Promise<ConversionResult> {
     blob,
     filename: file.name.replace(/\.[^/.]+$/, ".pdf"),
     outputType: "pdf",
+    processedAt: Date.now(),
+  };
+}
+
+export async function convertPdfToTxt(file: File): Promise<ConversionResult> {
+  const { getDocument } = await initPdfWorker();
+
+  const arrayBuffer = await file.arrayBuffer();
+  const loadingTask = getDocument({ data: arrayBuffer });
+  const pdf = await loadingTask.promise;
+
+  let text = "";
+
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const textContent = await page.getTextContent();
+    const pageText = textContent.items
+      .map((item: any) => item.str)
+      .join(" ");
+    
+    text += `Page ${i}\n\n${pageText}\n\n`;
+  }
+
+  const blob = new Blob([text], { type: "text/plain" });
+
+  return {
+    blob,
+    filename: file.name.replace(/\.[^/.]+$/, ".txt"),
+    outputType: "txt",
+    processedAt: Date.now(),
+  };
+}
+
+export async function convertPdfToPptx(file: File): Promise<ConversionResult> {
+  const { getDocument } = await initPdfWorker();
+  const PptxGenJS = (await import("pptxgenjs")).default;
+
+  const arrayBuffer = await file.arrayBuffer();
+  const loadingTask = getDocument({ data: arrayBuffer });
+  const pdf = await loadingTask.promise;
+
+  const pptx = new PptxGenJS();
+
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const textContent = await page.getTextContent();
+    const pageText = textContent.items
+      .map((item: any) => item.str)
+      .join(" ");
+
+    const slide = pptx.addSlide();
+    
+    // Add page number title
+    slide.addText(`Page ${i}`, {
+      x: 0.5,
+      y: 0.5,
+      w: "90%",
+      h: 0.5,
+      fontSize: 18,
+      bold: true,
+      color: "363636",
+    });
+
+    // Add content
+    // Note: This puts all text from the page into one text box. 
+    // Preserving layout is extremely difficult without complex analysis.
+    if (pageText.trim()) {
+      slide.addText(pageText, {
+        x: 0.5,
+        y: 1.2,
+        w: "90%",
+        h: 4,
+        fontSize: 12,
+        color: "666666",
+      });
+    }
+  }
+
+  const blob = await pptx.write({ outputType: "blob" }) as Blob;
+
+  return {
+    blob,
+    filename: file.name.replace(/\.[^/.]+$/, ".pptx"),
+    outputType: "pptx",
     processedAt: Date.now(),
   };
 }

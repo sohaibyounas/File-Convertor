@@ -7,6 +7,8 @@ import {
   convertPptxToDocx,
   convertDocxToPptx,
   convertImageToPdf,
+  convertPdfToTxt,
+  convertPdfToPptx,
 } from "@/lib/converters";
 import {
   convertImageToTextWithOCR,
@@ -45,6 +47,10 @@ export function useConversion() {
       if (sourceType === "pdf") {
         if (targetFormat === "docx") {
           return await convertPdfToDocx(file);
+        } else if (targetFormat === "txt") {
+          return await convertPdfToTxt(file);
+        } else if (targetFormat === "pptx") {
+          return await convertPdfToPptx(file);
         }
       }
 
@@ -73,7 +79,7 @@ export function useConversion() {
   const convertFiles = async (options: ConversionOptions) => {
     setProcessing(true);
 
-    const pendingFiles = files.filter((f) => f.status === "pending");
+    const pendingFiles = files.filter((f) => f.status === "pending" || f.status === "error");
 
     for (const file of pendingFiles) {
       try {

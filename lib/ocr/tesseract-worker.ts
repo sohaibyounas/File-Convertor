@@ -3,9 +3,14 @@ import type { OCRResult, ConversionResult } from "@/types";
 import { Document, Paragraph, TextRun, Packer } from "docx";
 
 let worker: Worker | null = null;
+let currentLanguage: string | null = null;
 
 export async function initOCRWorker(language = "eng"): Promise<Worker> {
-  if (worker) return worker;
+  if (worker && currentLanguage === language) return worker;
+
+  if (worker) {
+    await worker.terminate();
+  }
 
   worker = await createWorker(language, 1, {
     logger: (m: any) => {
@@ -15,6 +20,7 @@ export async function initOCRWorker(language = "eng"): Promise<Worker> {
     },
   });
 
+  currentLanguage = language;
   return worker;
 }
 
