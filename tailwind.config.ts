@@ -71,6 +71,10 @@ const config: Config = {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.5" },
         },
+        "spin-reverse": {
+          from: { transform: "rotate(360deg)" },
+          to: { transform: "rotate(0deg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -78,6 +82,7 @@ const config: Config = {
         shimmer: "shimmer 2s linear infinite",
         float: "float 3s ease-in-out infinite",
         glow: "glow 2s ease-in-out infinite",
+        "spin-reverse": "spin-reverse 1s linear infinite",
       },
     },
   },

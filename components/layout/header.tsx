@@ -5,6 +5,7 @@ import { Moon, Sun, FileText } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export function Header() {
   const { resolvedTheme, setTheme } = useTheme();
@@ -24,20 +25,22 @@ export function Header() {
     >
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
-        <motion.div
-          className="flex items-center gap-3 cursor-pointer"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          role="heading"
-          aria-level={1}
-        >
-          <div className="rounded-lg bg-linear-to-br from-purple-600 to-pink-600 p-2 shadow-lg">
-            <FileText className="h-6 w-6 text-white" />
-          </div>
-          <span className="text-2xl font-bold bg-linear-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
-            FileConvert Pro
-          </span>
-        </motion.div>
+        <Link href="/">
+          <motion.div
+            className="flex items-center gap-3 cursor-pointer"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            role="heading"
+            aria-level={1}
+          >
+            <div className="rounded-lg bg-linear-to-br from-purple-600 to-pink-600 p-2 shadow-lg">
+              <FileText className="h-6 w-6 text-white" />
+            </div>
+            <span className="text-2xl font-bold bg-linear-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
+              FileConvert Pro
+            </span>
+          </motion.div>
+        </Link>
 
         {/* Navigation */}
         <nav className="hidden md:flex items-center gap-8">

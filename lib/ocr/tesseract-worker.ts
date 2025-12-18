@@ -1,6 +1,6 @@
 import { createWorker, type Worker } from "tesseract.js";
 import type { OCRResult, ConversionResult } from "@/types";
-import { Document, Paragraph, TextRun, Packer } from "docx";
+
 
 let worker: Worker | null = null;
 let currentLanguage: string | null = null;
@@ -68,11 +68,14 @@ export async function convertImageToTextWithOCR(
   };
 }
 
+// Removed static import of docx
+
 export async function convertImageToDocxWithOCR(
   file: File,
   language = "eng",
   onProgress?: (progress: number) => void
 ): Promise<ConversionResult> {
+  const { Document, Paragraph, TextRun, Packer } = await import("docx");
   const ocrResult = await performOCR(file, language, onProgress);
 
   // Create DOCX with OCR text

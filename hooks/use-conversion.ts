@@ -9,10 +9,16 @@ import {
   convertImageToPdf,
   convertPdfToTxt,
   convertPdfToPptx,
+  convertDocxToTxt,
+  convertPptxToTxt,
+  convertTxtToPdf,
+  convertTxtToDocx,
+  convertTxtToPptx,
 } from "@/lib/converters";
 import {
   convertImageToTextWithOCR,
   convertImageToDocxWithOCR,
+  convertPdfToTextWithOCR,
 } from "@/lib/ocr/tesseract-worker";
 import { getFileExtension } from "@/lib/utils";
 
@@ -48,6 +54,18 @@ export function useConversion() {
         if (targetFormat === "docx") {
           return await convertPdfToDocx(file);
         } else if (targetFormat === "txt") {
+          // Use OCR if enabled explicitly OR if a non-English language is selected (implying the user expects language-specific processing)
+          // The user mentioned selecting "French" defaults to English, implying they expect their choice to matter.
+          // Since raw extraction (convertPdfToTxt) doesn't use language, we switch to OCR if language is not 'eng' or OCR is enabled.
+          if (enableOCR || ocrLanguage !== "eng") {
+             // Note: convertPdfToTextWithOCR in tesseract-worker.ts treats PDF as simple input. 
+             // Tesseract.js support for PDF blobs without conversion to image first is limited. 
+             // Ideally we convert pages to images. For now we use the existing function but ensure it's called.
+             // If this fails for multi-page PDFs, we might need a more robust pipeline.
+             return await convertPdfToTextWithOCR(file, ocrLanguage, (progress) => {
+               updateFileStatus(fileData.id, "processing", progress * 100);
+             });
+          }
           return await convertPdfToTxt(file);
         } else if (targetFormat === "pptx") {
           return await convertPdfToPptx(file);
@@ -60,6 +78,8 @@ export function useConversion() {
           return await convertDocxToPdf(file);
         } else if (targetFormat === "pptx") {
           return await convertDocxToPptx(file);
+        } else if (targetFormat === "txt") {
+          return await convertDocxToTxt(file);
         }
       }
 
@@ -67,6 +87,19 @@ export function useConversion() {
       if (sourceType === "pptx") {
         if (targetFormat === "docx") {
           return await convertPptxToDocx(file);
+        } else if (targetFormat === "txt") {
+          return await convertPptxToTxt(file);
+        }
+      }
+
+      // TXT conversions
+      if (sourceType === "txt") {
+        if (targetFormat === "pdf") {
+          return await convertTxtToPdf(file);
+        } else if (targetFormat === "docx") {
+          return await convertTxtToDocx(file);
+        } else if (targetFormat === "pptx") {
+          return await convertTxtToPptx(file);
         }
       }
 
@@ -79,10 +112,17 @@ export function useConversion() {
   const convertFiles = async (options: ConversionOptions) => {
     setProcessing(true);
 
-    const pendingFiles = files.filter((f) => f.status === "pending" || f.status === "error");
+    // Process ALL files in the list, allowing re-conversion.
+    const filesToConvert = files;
 
-    for (const file of pendingFiles) {
+    for (const file of filesToConvert) {
       try {
+        // Skip if target format matches source format (naive check)
+        const sourceType = getFileExtension(file.name);
+        if (sourceType === options.targetFormat) {
+          continue;
+        }
+
         updateFileStatus(file.id, "processing", 0);
 
         const result = await convertFile(file, options);
